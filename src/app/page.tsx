@@ -96,7 +96,7 @@ export default async function Home() {
               <CardTitle>Giao dịch gần đây</CardTitle>
             </CardHeader>
             <CardContent className="pl-0">
-              <TransactionList transactions={transactions} />
+              <TransactionList transactions={transactions} categories={categories} />
             </CardContent>
           </Card>
         </div>

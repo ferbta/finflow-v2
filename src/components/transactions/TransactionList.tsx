@@ -1,3 +1,5 @@
+'use client';
+
 import { Category, Transaction } from '@prisma/client'
 import { format } from 'date-fns'
 import * as Icons from 'lucide-react'
@@ -10,15 +12,37 @@ interface TransactionListProps {
 }
 
 import { IconWrapper } from '@/components/ui/icon-wrapper'
+import { Pencil, Trash2, MoreVertical } from 'lucide-react'
+import { useState } from 'react'
+import { deleteTransaction } from '@/app/actions'
+import { toast } from 'sonner'
+import { EditTransactionModal } from './EditTransactionModal'
+import { Button } from '@/components/ui/button'
 
-export function TransactionList({ transactions }: TransactionListProps) {
-    // Group by date
+export function TransactionList({ transactions, categories }: { transactions: TransactionWithCategory[], categories: Category[] }) {
+    const [editingTransaction, setEditingTransaction] = useState<TransactionWithCategory | null>(null)
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const grouped = transactions.reduce((acc, t) => {
         const dateKey = format(t.date ? new Date(t.date) : new Date(), 'yyyy-MM-dd')
         if (!acc[dateKey]) acc[dateKey] = []
         acc[dateKey].push(t)
         return acc
     }, {} as Record<string, TransactionWithCategory[]>)
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('Bạn có chắc chắn muốn xóa giao dịch này?')) return
+        try {
+            await deleteTransaction(id)
+            toast.success('Xóa giao dịch thành công')
+        } catch (error) {
+            toast.error('Không thể xóa giao dịch')
+        }
+    }
+
+    const handleEdit = (t: TransactionWithCategory) => {
+        setEditingTransaction(t)
+        setIsEditModalOpen(true)
+    }
 
     const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
 
@@ -54,18 +78,50 @@ export function TransactionList({ transactions }: TransactionListProps) {
                                             <p className="text-[10px] md:text-xs text-muted-foreground truncate">{category?.name || 'Danh mục chưa đặt tên'}</p>
                                         </div>
                                     </div>
-                                    <span className={cn(
-                                        "font-bold text-xs md:text-sm tabular-nums shrink-0",
-                                        t.type === 'income' ? 'text-emerald-500' : 'text-foreground'
-                                    )}>
-                                        {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount || 0)}
-                                    </span>
+                                    <div className="flex items-center gap-2 md:gap-4 shrink-0">
+                                        <span className={cn(
+                                            "font-bold text-xs md:text-sm tabular-nums",
+                                            t.type === 'income' ? 'text-emerald-500' : 'text-foreground'
+                                        )}>
+                                            {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount || 0)}
+                                        </span>
+                                        <div className="flex items-center gap-1 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                                onClick={() => handleEdit(t)}
+                                            >
+                                                <Pencil className="h-3.5 w-3.5" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-muted-foreground hover:text-rose-500"
+                                                onClick={() => handleDelete(t.id)}
+                                            >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                             )
                         })}
                     </div>
                 </div>
             ))}
+
+            {editingTransaction && (
+                <EditTransactionModal
+                    transaction={editingTransaction}
+                    categories={categories}
+                    isOpen={isEditModalOpen}
+                    onClose={() => {
+                        setIsEditModalOpen(false)
+                        setEditingTransaction(null)
+                    }}
+                />
+            )}
         </div>
     )
 }
