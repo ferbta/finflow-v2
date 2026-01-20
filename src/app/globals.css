@@ -30,35 +30,35 @@
 
 @layer base {
   :root {
-    --background: hsl(222.2 84% 4.9%);
+    --background: hsl(230 40% 4%);
     --foreground: hsl(210 40% 98%);
 
-    --card: hsl(222.2 84% 4.9%);
+    --card: hsl(230 40% 6%);
     --card-foreground: hsl(210 40% 98%);
 
-    --popover: hsl(222.2 84% 4.9%);
+    --popover: hsl(230 40% 6%);
     --popover-foreground: hsl(210 40% 98%);
 
-    --primary: hsl(217.2 91.2% 59.8%);
-    --primary-foreground: hsl(222.2 47.4% 11.2%);
+    --primary: hsl(262 83% 58%);
+    --primary-foreground: hsl(210 40% 98%);
 
-    --secondary: hsl(217.2 32.6% 17.5%);
+    --secondary: hsl(230 20% 15%);
     --secondary-foreground: hsl(210 40% 98%);
 
-    --muted: hsl(217.2 32.6% 17.5%);
-    --muted-foreground: hsl(215 20.2% 65.1%);
+    --muted: hsl(230 20% 15%);
+    --muted-foreground: hsl(215 20% 65%);
 
-    --accent: hsl(217.2 32.6% 17.5%);
+    --accent: hsl(262 83% 58%);
     --accent-foreground: hsl(210 40% 98%);
 
-    --destructive: hsl(0 62.8% 30.6%);
+    --destructive: hsl(0 84% 60%);
     --destructive-foreground: hsl(210 40% 98%);
 
-    --border: hsl(217.2 32.6% 17.5%);
-    --input: hsl(217.2 32.6% 17.5%);
-    --ring: hsl(212.7 26.8% 83.9%);
+    --border: hsl(230 20% 15%);
+    --input: hsl(230 20% 15%);
+    --ring: hsl(262 83% 58%);
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   * {
@@ -66,15 +66,44 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground selection:bg-primary/30;
   }
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+.animate-blob {
+  animation: float 20s infinite alternate;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
 
 /* Glassmorphism Utilities */
 .glass {
-  @apply bg-white/5 backdrop-blur-lg border border-white/10;
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
 }
 
 .glass-card {
-  @apply bg-slate-900/50 backdrop-blur-md border border-slate-800/50 shadow-xl;
+  @apply bg-slate-900/40 backdrop-blur-xl border border-white/5 shadow-2xl;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.mesh-gradient {
+  background-color: var(--background);
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(262, 83%, 58%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(230, 84%, 50%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(262, 83%, 58%, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(230, 84%, 50%, 0.1) 0px, transparent 50%);
 }

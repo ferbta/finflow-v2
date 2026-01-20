@@ -202,3 +202,38 @@ export async function deleteCategory(id: string) {
     revalidatePath('/categories');
     return { success: true };
 }
+
+export async function deleteTransaction(id: string) {
+    await prisma.transaction.delete({
+        where: { id }
+    });
+    revalidatePath('/');
+    return { success: true };
+}
+
+export async function updateTransaction(id: string, formData: FormData) {
+    const amount = parseFloat(formData.get('amount') as string);
+    const description = formData.get('description') as string;
+    const categoryId = formData.get('category') as string;
+    const dateStr = formData.get('date') as string;
+    const date = new Date(dateStr);
+
+    const category = await prisma.category.findUnique({
+        where: { id: categoryId }
+    });
+    if (!category) throw new Error('Category not found');
+
+    await prisma.transaction.update({
+        where: { id },
+        data: {
+            amount,
+            description,
+            categoryId,
+            date,
+            type: category.type || 'expense'
+        }
+    });
+
+    revalidatePath('/');
+    return { success: true };
+}

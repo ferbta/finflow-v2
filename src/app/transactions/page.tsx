@@ -1,12 +1,15 @@
 
 import { TransactionList } from "@/components/transactions/TransactionList";
-import { getTransactions } from "../actions";
+import { getTransactions, getCategories } from "../actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const dynamic = 'force-dynamic';
 
 export default async function TransactionsPage() {
-    const transactions = await getTransactions();
+    const [transactions, categories] = await Promise.all([
+        getTransactions(),
+        getCategories()
+    ]);
 
     return (
         <div className="space-y-8 pb-10">
@@ -17,7 +20,7 @@ export default async function TransactionsPage() {
 
             <Card className="border-none bg-transparent shadow-none">
                 <CardContent className="px-0">
-                    <TransactionList transactions={transactions} />
+                    <TransactionList transactions={transactions} categories={categories} />
                 </CardContent>
             </Card>
         </div>
